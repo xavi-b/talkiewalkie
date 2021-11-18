@@ -25,6 +25,7 @@ set(PROJECT_SOURCES
         login.h
         talkie.cpp
         talkie.h
+        wav.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

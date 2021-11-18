@@ -13,6 +13,7 @@ public:
     void setFrequency(QString const& frequency);
     void addClient(QTcpSocket* client);
     void onDisconnected();
+    void onRead();
 
 signals:
     void emptyFrequency(QString const&);

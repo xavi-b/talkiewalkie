@@ -25,6 +25,7 @@ void Frequency::setFrequency(const QString& frequency)
 void Frequency::addClient(QTcpSocket* client)
 {
     connect(client, &QTcpSocket::disconnected, this, &Frequency::onDisconnected);
+    connect(client, &QTcpSocket::readyRead, this, &Frequency::onRead);
     clients.append(client);
 }
 
@@ -36,5 +37,18 @@ void Frequency::onDisconnected()
     if (clients.size() == 0)
     {
         emit emptyFrequency(frequency);
+    }
+}
+
+void Frequency::onRead()
+{
+    QTcpSocket* socket = (QTcpSocket*)sender();
+
+    QByteArray data = socket->readAll();
+
+    for (auto const& client : clients)
+    {
+        if (client != socket)
+            client->write(data);
     }
 }

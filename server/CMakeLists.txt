@@ -19,9 +19,9 @@ set(PROJECT_SOURCES
         main.cpp
         server.cpp
         server.h
-        users.csv
         frequency.cpp
         frequency.h
+        users.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

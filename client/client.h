@@ -3,6 +3,7 @@
 
 #include <QStackedWidget>
 #include <QTcpSocket>
+#include <QSoundEffect>
 
 #include "login.h"
 #include "talkie.h"
@@ -22,8 +23,9 @@ public slots:
     void connectToHost(QString const& url, int port, QString const& username, QString const& password, QString const& frequency);
 
 private:
-    QTcpSocket socket;
-    Login*     login;
-    Talkie*    talkie;
+    QTcpSocket   socket;
+    Login*       login;
+    Talkie*      talkie;
+    QSoundEffect effect;
 };
 #endif // WIDGET_H

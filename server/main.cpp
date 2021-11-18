@@ -6,14 +6,8 @@ int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
 
-    if (a.arguments().size() < 1)
-    {
-        qWarning() << "Missing port argument";
-        return 1;
-    }
-
-    bool   ok   = false;
-    ushort port = a.arguments().at(1).toUShort(&ok);
+    bool   ok   = true;
+    ushort port = a.arguments().size() > 1 ? a.arguments().at(1).toUShort(&ok) : 7777;
     if (!ok)
     {
         qWarning() << "Port argument must be a number between" << 1 << "and" << USHRT_MAX;

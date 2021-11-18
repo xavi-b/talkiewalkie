@@ -8,12 +8,16 @@ Client::Client(QWidget* parent)
     talkie = new Talkie;
     addWidget(talkie);
 
+    effect.setSource(QUrl("qrc:/beep.wav"));
+    effect.setVolume(0.5f);
+
     connect(&socket, &QTcpSocket::readyRead, this, &Client::onRead);
     connect(&socket, &QTcpSocket::connected, this, &Client::onConnected);
     connect(&socket, &QTcpSocket::disconnected, this, &Client::onDisconnected);
 
     connect(login, &Login::connectToHost, this, &Client::connectToHost);
 
+    connect(talkie, &Talkie::send, &socket, QOverload<QByteArray const&>::of((&QTcpSocket::write)));
     connect(talkie, &Talkie::quit, &socket, &QTcpSocket::close);
 }
 
@@ -24,7 +28,13 @@ Client::~Client()
 
 void Client::onRead()
 {
-    // TODO play
+    QByteArray data = socket.readAll();
+    if (data.contains("BEEP"))
+    {
+        data.remove(data.indexOf("BEEP"), 5);
+        effect.play();
+    }
+    talkie->play(data);
 }
 
 void Client::onConnected()

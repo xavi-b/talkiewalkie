@@ -5,7 +5,7 @@ Server::Server(ushort port, QWidget* parent)
 {
     connect(&serv, &QTcpServer::newConnection, this, &Server::onConnexion);
 
-    QFile file("users.csv");
+    QFile file(":/users.csv");
     if (!file.open(QIODevice::ReadOnly))
     {
         qWarning() << file.errorString();
