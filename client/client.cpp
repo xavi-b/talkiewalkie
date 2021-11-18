@@ -14,6 +14,10 @@ Client::Client(QWidget* parent)
     connect(&socket, &QTcpSocket::readyRead, this, &Client::onRead);
     connect(&socket, &QTcpSocket::connected, this, &Client::onConnected);
     connect(&socket, &QTcpSocket::disconnected, this, &Client::onDisconnected);
+    connect(&socket, &QTcpSocket::errorOccurred, this, [=]() {
+        login->setConnectBtnEnabled(true);
+        qCritical() << socket.errorString();
+    });
 
     connect(login, &Login::connectToHost, this, &Client::connectToHost);
 

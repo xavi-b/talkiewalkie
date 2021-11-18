@@ -13,9 +13,11 @@ Server::Server(ushort port, QWidget* parent)
 
     while (!file.atEnd())
     {
+        qDebug() << "Loaded user";
         QList<QByteArray> line = file.readLine().split(',');
+        qDebug() << line;
         if (line.size() >= 2)
-            users[line[0]] = line[1];
+            users[line[0]] = line[1].trimmed();
     }
 
     serv.listen(QHostAddress::Any, port);
@@ -32,15 +34,20 @@ void Server::onConnexion()
 {
     QTcpSocket* tmpSocket = serv.nextPendingConnection();
 
+    qDebug() << "New connexion";
+
     connect(tmpSocket, &QTcpSocket::readyRead, this, &Server::onFirstRead);
 }
 
 void Server::onFirstRead()
 {
+    qDebug() << "First read";
+
     QTcpSocket* tmpSocket = (QTcpSocket*)sender();
     disconnect(tmpSocket, &QTcpSocket::readyRead, this, &Server::onFirstRead);
 
     QStringList data = QString(tmpSocket->readAll()).split(',');
+    qDebug() << data;
 
     if (data.size() == 3)
     {
@@ -50,6 +57,8 @@ void Server::onFirstRead()
 
         if (checkUser(username, password))
         {
+            qDebug() << "User checks";
+
             if (!frequency.isEmpty())
             {
                 if (!frequencies.contains(frequency))
@@ -65,6 +74,8 @@ void Server::onFirstRead()
                 return;
             }
         }
+        else
+            qDebug() << "User does not check";
     }
 
     tmpSocket->close();
