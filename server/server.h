@@ -5,21 +5,27 @@
 #include <QTcpServer>
 #include <QMap>
 #include <QString>
+#include <QFile>
 
 #include "frequency.h"
 
-class Widget : public QWidget
+class Server : public QWidget
 {
     Q_OBJECT
 
 public:
-    Widget(QWidget* parent = nullptr);
-    ~Widget();
+    Server(ushort port, QWidget* parent = nullptr);
+    ~Server();
 
     void onConnexion();
+    void onFirstRead();
+
+protected:
+    virtual bool checkUser(QString const& username, QString const& password) const;
 
 private:
     QTcpServer                serv;
     QMap<QString, Frequency*> frequencies;
+    QMap<QString, QString>    users;
 };
 #endif // WIDGET_H

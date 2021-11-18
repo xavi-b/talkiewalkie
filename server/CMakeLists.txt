@@ -17,8 +17,8 @@ find_package(Qt${QT_VERSION_MAJOR}
 
 set(PROJECT_SOURCES
         main.cpp
-        widget.cpp
-        widget.h
+        server.cpp
+        server.h
         users.csv
         frequency.cpp
         frequency.h

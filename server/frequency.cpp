@@ -1,6 +1,7 @@
 #include "frequency.h"
 
-Frequency::Frequency(QObject* parent) : QObject(parent)
+Frequency::Frequency(QObject* parent)
+    : QObject(parent)
 {
 }
 

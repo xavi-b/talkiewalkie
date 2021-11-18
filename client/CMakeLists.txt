@@ -6,19 +6,21 @@ find_package(QT NAMES Qt6 Qt5
     COMPONENTS
     Widgets
     Network
+    Multimedia
     REQUIRED
 )
 find_package(Qt${QT_VERSION_MAJOR}
     COMPONENTS
     Widgets
     Network
+    Multimedia
     REQUIRED
 )
 
 set(PROJECT_SOURCES
         main.cpp
-        widget.cpp
-        widget.h
+        client.cpp
+        client.h
         login.cpp
         login.h
         talkie.cpp
@@ -52,6 +54,7 @@ target_link_libraries(${MODULE_NAME}
     PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Multimedia
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)

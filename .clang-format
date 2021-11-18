@@ -9,3 +9,4 @@ AccessModifierOffset: -4
 PointerBindsToType: true
 SortIncludes: false
 AllowShortLambdasOnASingleLine: None
+ColumnLimit: 0
