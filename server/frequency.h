@@ -2,6 +2,7 @@
 #define FREQUENCY_H
 
 #include <QTcpSocket>
+#include <QDateTime>
 
 class Frequency : public QObject
 {

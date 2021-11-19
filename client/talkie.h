@@ -11,6 +11,7 @@
 #include <QAudioDevice>
 #include <QAudioSource>
 #include <QAudioSink>
+#include <QDateTime>
 
 class AudioInfo : public QIODevice
 {
@@ -76,6 +77,8 @@ private:
     void initializeInputAudio(const QAudioDevice& deviceInfo);
     void initializeOutputAudio(const QAudioDevice& deviceInfo);
 
+    QIODevice*                   audioOutputIo;
+    QByteArray                   buffer;
     QScopedPointer<AudioInfo>    audioInfo;
     QScopedPointer<QAudioSource> audioInput;
     QScopedPointer<QAudioSink>   audioOutput;

@@ -42,7 +42,7 @@ void Frequency::onDisconnected()
 
 void Frequency::onRead()
 {
-    qDebug() << "Data on frequency" << frequency;
+    qDebug() << QDateTime::currentDateTimeUtc() << "Data on frequency" << frequency;
 
     QTcpSocket* socket = (QTcpSocket*)sender();
 

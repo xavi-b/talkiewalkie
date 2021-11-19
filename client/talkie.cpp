@@ -166,12 +166,20 @@ void Talkie::initializeInputAudio(const QAudioDevice& deviceInfo)
 
 void Talkie::initializeOutputAudio(const QAudioDevice& deviceInfo)
 {
-    QAudioFormat format = deviceInfo.preferredFormat();
+    QAudioFormat format;
+    format.setSampleRate(8000);
+    format.setChannelCount(1);
+    format.setSampleFormat(QAudioFormat::Int16);
+
     audioOutput.reset(new QAudioSink(deviceInfo, format));
+    audioOutput->setVolume(2.0f);
+    audioOutputIo = audioOutput->start();
 }
 
 void Talkie::record()
 {
+    qDebug() << "Record";
+
     send("BEEP");
     auto io = audioInput->start();
     connect(io, &QIODevice::readyRead, [&, io]() {
@@ -184,6 +192,7 @@ void Talkie::record()
         qint64     l = io->read(buffer.data(), len);
         if (l > 0)
         {
+            qDebug() << QDateTime::currentDateTimeUtc() << "Sending data" << l;
             audioInfo->write(buffer.constData(), l);
             send(QByteArray(buffer.constData(), l));
         }
@@ -192,16 +201,21 @@ void Talkie::record()
 
 void Talkie::stop()
 {
+    qDebug() << "Stop";
+
     audioInput->suspend();
     send("BEEP");
 }
 
 void Talkie::play(QByteArray const& data)
 {
-    auto io = audioOutput->start();
-    if (audioOutput->state() == QAudio::StoppedState)
-        return;
-    io->write(data);
+    buffer.append(data);
+    if (buffer.length() > 4096)
+    {
+        qDebug() << QDateTime::currentDateTimeUtc() << "Receiving data" << buffer.length();
+        audioOutputIo->write(buffer);
+        buffer.clear();
+    }
 }
 
 void Talkie::keyPressEvent(QKeyEvent* event)

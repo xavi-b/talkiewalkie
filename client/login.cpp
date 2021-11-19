@@ -20,6 +20,7 @@ Login::Login(QWidget* parent)
     username->setText("admin");
     layout->addWidget(username);
     password = new QLineEdit;
+    password->setText("admin");
     password->setEchoMode(QLineEdit::Password);
     layout->addWidget(password);
     code = new QLineEdit;
