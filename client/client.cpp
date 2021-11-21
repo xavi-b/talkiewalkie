@@ -5,7 +5,7 @@ Client::Client(QWidget* parent)
 {
     login = new Login;
     addWidget(login);
-    talkie = new Talkie;
+    talkie = new Talkie(&socket);
     addWidget(talkie);
 
     effect.setSource(QUrl("qrc:/beep.wav"));
@@ -38,7 +38,7 @@ void Client::onRead()
         data.remove(data.indexOf("BEEP"), 5);
         //TODO effect.play();
     }
-    talkie->play(data);
+    talkie->play();
 }
 
 void Client::onConnected()
@@ -49,6 +49,7 @@ void Client::onConnected()
 
 void Client::onDisconnected()
 {
+    talkie->stop();
     login->setConnectBtnEnabled(true);
     setCurrentWidget(login);
 }

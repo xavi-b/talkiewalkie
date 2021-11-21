@@ -1,93 +1,8 @@
 #include "talkie.h"
 
-AudioInfo::AudioInfo(const QAudioFormat& format)
-    : m_format(format)
-{
-}
-
-void AudioInfo::start()
-{
-    open(QIODevice::WriteOnly);
-}
-
-void AudioInfo::stop()
-{
-    close();
-}
-
-qint64 AudioInfo::readData(char* data, qint64 maxlen)
-{
-    Q_UNUSED(data);
-    Q_UNUSED(maxlen);
-
-    return 0;
-}
-
-qint64 AudioInfo::writeData(const char* data, qint64 len)
-{
-    const int channelBytes = m_format.bytesPerSample();
-    const int sampleBytes  = m_format.bytesPerFrame();
-    Q_ASSERT(len % sampleBytes == 0);
-    const int numSamples = len / sampleBytes;
-
-    float                maxValue = 0;
-    const unsigned char* ptr      = reinterpret_cast<const unsigned char*>(data);
-
-    for (int i = 0; i < numSamples; ++i)
-    {
-        for (int j = 0; j < m_format.channelCount(); ++j)
-        {
-            float value = m_format.normalizedSampleValue(ptr);
-
-            maxValue = qMax(value, maxValue);
-            ptr += channelBytes;
-        }
-    }
-
-    m_level = maxValue;
-
-    emit update();
-    return len;
-}
-
-RenderArea::RenderArea(QWidget* parent)
-    : QWidget(parent)
-{
-    setBackgroundRole(QPalette::Base);
-    setAutoFillBackground(true);
-
-    setMinimumHeight(30);
-    setMinimumWidth(200);
-}
-
-void RenderArea::paintEvent(QPaintEvent* /* event */)
-{
-    QPainter painter(this);
-
-    painter.setPen(Qt::black);
-    painter.drawRect(QRect(painter.viewport().left() + 10,
-                           painter.viewport().top() + 10,
-                           painter.viewport().right() - 20,
-                           painter.viewport().bottom() - 20));
-    if (m_level == 0.0)
-        return;
-
-    int pos = ((painter.viewport().right() - 20) - (painter.viewport().left() + 11)) * m_level;
-    painter.fillRect(painter.viewport().left() + 11,
-                     painter.viewport().top() + 10,
-                     pos,
-                     painter.viewport().height() - 21,
-                     Qt::red);
-}
-
-void RenderArea::setLevel(qreal value)
-{
-    m_level = value;
-    update();
-}
-
-Talkie::Talkie(QWidget* parent)
+Talkie::Talkie(QTcpSocket* socket, QWidget* parent)
     : QWidget(parent),
+      socket(socket),
       devices(new QMediaDevices(this))
 {
     QVBoxLayout* layout = new QVBoxLayout;
@@ -112,9 +27,6 @@ Talkie::Talkie(QWidget* parent)
     }
     layout->addWidget(outputDeviceBox);
 
-    canvas = new RenderArea(this);
-    layout->addWidget(canvas);
-
     speakBtn = new QPushButton;
     speakBtn->setText("Speak");
     layout->addWidget(speakBtn);
@@ -125,7 +37,6 @@ Talkie::Talkie(QWidget* parent)
     setLayout(layout);
 
     connect(inputDeviceBox, QOverload<int>::of(&QComboBox::activated), this, [=](int index) {
-        audioInfo->stop();
         audioInput->stop();
         audioInput->disconnect(this);
 
@@ -155,13 +66,11 @@ void Talkie::initializeInputAudio(const QAudioDevice& deviceInfo)
     format.setChannelCount(1);
     format.setSampleFormat(QAudioFormat::Int16);
 
-    audioInfo.reset(new AudioInfo(format));
-    connect(audioInfo.data(), &AudioInfo::update, [this]() {
-        canvas->setLevel(audioInfo->level());
-    });
-
     audioInput.reset(new QAudioSource(deviceInfo, format));
-    audioInfo->start();
+
+    connect(audioInput.get(), &QAudioSource::stateChanged, this, [=](QAudio::State state) {
+        qDebug() << "QAudioSource" << state;
+    });
 }
 
 void Talkie::initializeOutputAudio(const QAudioDevice& deviceInfo)
@@ -173,49 +82,35 @@ void Talkie::initializeOutputAudio(const QAudioDevice& deviceInfo)
 
     audioOutput.reset(new QAudioSink(deviceInfo, format));
     audioOutput->setVolume(2.0f);
-    audioOutputIo = audioOutput->start();
+    audioOutput->start(socket);
+
+    qDebug() << "QAudioSink" << audioOutput->state();
+
+    connect(audioOutput.get(), &QAudioSink::stateChanged, this, [=](QAudio::State state) {
+        qDebug() << "QAudioSink" << state;
+    });
 }
 
 void Talkie::record()
 {
     qDebug() << "Record";
 
-    send("BEEP");
-    auto io = audioInput->start();
-    connect(io, &QIODevice::readyRead, [&, io]() {
-        qint64    len        = audioInput->bytesAvailable();
-        const int BufferSize = 4096;
-        if (len > BufferSize)
-            len = BufferSize;
-
-        QByteArray buffer(len, 0);
-        qint64     l = io->read(buffer.data(), len);
-        if (l > 0)
-        {
-            qDebug() << QDateTime::currentDateTimeUtc() << "Sending data" << l;
-            audioInfo->write(buffer.constData(), l);
-            send(QByteArray(buffer.constData(), l));
-        }
-    });
+    //send("BEEP");
+    audioInput->start(socket);
 }
 
 void Talkie::stop()
 {
     qDebug() << "Stop";
 
-    audioInput->suspend();
-    send("BEEP");
+    audioInput->stop();
+    //send("BEEP");
 }
 
-void Talkie::play(QByteArray const& data)
+void Talkie::play()
 {
-    buffer.append(data);
-    if (buffer.length() > 4096)
-    {
-        qDebug() << QDateTime::currentDateTimeUtc() << "Receiving data" << buffer.length();
-        audioOutputIo->write(buffer);
-        buffer.clear();
-    }
+    qDebug() << "Data";
+    //audioOutput->resume();
 }
 
 void Talkie::keyPressEvent(QKeyEvent* event)
