@@ -33,12 +33,20 @@ Client::~Client()
 void Client::onRead()
 {
     QByteArray data = socket.readAll();
+    qDebug() << "onRead" << data.size();
     if (data.contains("BEEP"))
     {
         data.remove(data.indexOf("BEEP"), 5);
-        //TODO effect.play();
+        effect.play();
     }
-    talkie->play();
+    if (data.contains("STOP"))
+    {
+        data.remove(data.indexOf("STOP"), 5);
+        effect.play();
+        talkie->resetAudioOutput();
+    }
+    else
+        talkie->play(data);
 }
 
 void Client::onConnected()

@@ -44,10 +44,7 @@ Talkie::Talkie(QTcpSocket* socket, QWidget* parent)
     });
 
     connect(outputDeviceBox, QOverload<int>::of(&QComboBox::activated), this, [=](int index) {
-        audioOutput->stop();
-        audioOutput->disconnect(this);
-
-        initializeOutputAudio(outputDeviceBox->itemData(index).value<QAudioDevice>());
+        resetAudioOutput();
     });
 
     connect(quitBtn, &QPushButton::clicked, this, &Talkie::quit);
@@ -82,7 +79,7 @@ void Talkie::initializeOutputAudio(const QAudioDevice& deviceInfo)
 
     audioOutput.reset(new QAudioSink(deviceInfo, format));
     audioOutput->setVolume(2.0f);
-    audioOutput->start(socket);
+    audioOutputIo = audioOutput->start();
 
     qDebug() << "QAudioSink" << audioOutput->state();
 
@@ -95,7 +92,7 @@ void Talkie::record()
 {
     qDebug() << "Record";
 
-    //send("BEEP");
+    send("BEEP");
     audioInput->start(socket);
 }
 
@@ -103,14 +100,33 @@ void Talkie::stop()
 {
     qDebug() << "Stop";
 
+    send("STOP");
     audioInput->stop();
-    //send("BEEP");
 }
 
-void Talkie::play()
+void Talkie::play(QByteArray const& data)
 {
-    qDebug() << "Data";
-    //audioOutput->resume();
+    qDebug() << "Play";
+
+    audioBuffer.append(data);
+
+    if (audioBuffer.size() > 4092)
+    {
+        qDebug() << "Write";
+        audioOutputIo->write(audioBuffer);
+        audioBuffer.clear();
+    }
+}
+
+void Talkie::resetAudioOutput()
+{
+    qDebug() << "ResetAudioOutput";
+
+    audioBuffer.clear();
+    audioOutput->stop();
+    audioOutput->disconnect(this);
+
+    initializeOutputAudio(outputDeviceBox->currentData().value<QAudioDevice>());
 }
 
 void Talkie::keyPressEvent(QKeyEvent* event)

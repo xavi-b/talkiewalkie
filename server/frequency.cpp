@@ -42,11 +42,11 @@ void Frequency::onDisconnected()
 
 void Frequency::onRead()
 {
-    qDebug() << QDateTime::currentDateTimeUtc() << "Data on frequency" << frequency;
-
     QTcpSocket* socket = (QTcpSocket*)sender();
 
     QByteArray data = socket->readAll();
+
+    qDebug() << QDateTime::currentDateTimeUtc() << "Data on frequency" << frequency << data.size();
 
     for (auto const& client : clients)
     {

@@ -21,7 +21,8 @@ public:
     explicit Talkie(QTcpSocket* socket, QWidget* parent = nullptr);
     void record();
     void stop();
-    void play();
+    void play(QByteArray const& data);
+    void resetAudioOutput();
 
 signals:
     void send(QByteArray const&);
@@ -35,6 +36,8 @@ private:
     void initializeInputAudio(const QAudioDevice& deviceInfo);
     void initializeOutputAudio(const QAudioDevice& deviceInfo);
 
+    QIODevice*                   audioOutputIo;
+    QByteArray                   audioBuffer;
     QTcpSocket*                  socket;
     QScopedPointer<QAudioSource> audioInput;
     QScopedPointer<QAudioSink>   audioOutput;
