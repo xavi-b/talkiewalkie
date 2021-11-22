@@ -1,9 +1,8 @@
-#ifndef WIDGET_H
-#define WIDGET_H
+#ifndef CLIENT_H
+#define CLIENT_H
 
 #include <QStackedWidget>
 #include <QTcpSocket>
-#include <QSoundEffect>
 
 #include "login.h"
 #include "talkie.h"
@@ -26,6 +25,5 @@ private:
     QTcpSocket   socket;
     Login*       login;
     Talkie*      talkie;
-    QSoundEffect effect;
 };
-#endif // WIDGET_H
+#endif // CLIENT_H

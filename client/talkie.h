@@ -13,6 +13,8 @@
 #include <QAudioSink>
 #include <QDateTime>
 #include <QTcpSocket>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 class Talkie : public QWidget
 {
@@ -22,6 +24,7 @@ public:
     void record();
     void stop();
     void play(QByteArray const& data);
+    void beep();
     void resetAudioOutput();
 
 signals:
@@ -36,6 +39,7 @@ private:
     void initializeInputAudio(const QAudioDevice& deviceInfo);
     void initializeOutputAudio(const QAudioDevice& deviceInfo);
 
+    QMediaPlayer*                player;
     QIODevice*                   audioOutputIo;
     QByteArray                   audioBuffer;
     QTcpSocket*                  socket;

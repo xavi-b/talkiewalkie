@@ -36,6 +36,11 @@ Talkie::Talkie(QTcpSocket* socket, QWidget* parent)
 
     setLayout(layout);
 
+    player = new QMediaPlayer(this);
+    player->setAudioOutput(new QAudioOutput());
+    player->audioOutput()->setVolume(0.2f);
+    player->setSource(QUrl("qrc:/beep.wav"));
+
     connect(inputDeviceBox, QOverload<int>::of(&QComboBox::activated), this, [=](int index) {
         audioInput->stop();
         audioInput->disconnect(this);
@@ -118,6 +123,11 @@ void Talkie::play(QByteArray const& data)
         audioOutputIo->write(audioBuffer);
         audioBuffer.clear();
     }
+}
+
+void Talkie::beep()
+{
+    player->play();
 }
 
 void Talkie::resetAudioOutput()

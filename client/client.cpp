@@ -8,9 +8,6 @@ Client::Client(QWidget* parent)
     talkie = new Talkie(&socket);
     addWidget(talkie);
 
-    effect.setSource(QUrl("qrc:/beep.wav"));
-    effect.setVolume(0.2f);
-
     connect(&socket, &QTcpSocket::readyRead, this, &Client::onRead);
     connect(&socket, &QTcpSocket::connected, this, &Client::onConnected);
     connect(&socket, &QTcpSocket::disconnected, this, &Client::onDisconnected);
@@ -37,12 +34,12 @@ void Client::onRead()
     if (data.contains("BEEP"))
     {
         data.remove(data.indexOf("BEEP"), 5);
-        effect.play();
+        talkie->beep();
     }
     if (data.contains("STOP"))
     {
         data.remove(data.indexOf("STOP"), 5);
-        effect.play();
+        talkie->beep();
         talkie->resetAudioOutput();
     }
     else
