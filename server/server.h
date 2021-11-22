@@ -1,7 +1,7 @@
-#ifndef WIDGET_H
-#define WIDGET_H
+#ifndef SERVER_H
+#define SERVER_H
 
-#include <QWidget>
+#include <QObject>
 #include <QTcpServer>
 #include <QMap>
 #include <QString>
@@ -9,12 +9,12 @@
 
 #include "frequency.h"
 
-class Server : public QWidget
+class Server : public QObject
 {
     Q_OBJECT
 
 public:
-    Server(ushort port, QWidget* parent = nullptr);
+    Server(ushort port, QObject* parent = nullptr);
     ~Server();
 
     void onConnexion();
@@ -28,4 +28,4 @@ private:
     QMap<QString, Frequency*> frequencies;
     QMap<QString, QString>    users;
 };
-#endif // WIDGET_H
+#endif // SERVER_H

@@ -1,7 +1,7 @@
 #include "server.h"
 
-Server::Server(ushort port, QWidget* parent)
-    : QWidget(parent)
+Server::Server(ushort port, QObject* parent)
+    : QObject(parent)
 {
     connect(&serv, &QTcpServer::newConnection, this, &Server::onConnexion);
 

@@ -1,10 +1,10 @@
 #include "server.h"
 
-#include <QApplication>
+#include <QCoreApplication>
 
 int main(int argc, char* argv[])
 {
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
 
     bool   ok   = true;
     ushort port = a.arguments().size() > 1 ? a.arguments().at(1).toUShort(&ok) : 7777;
@@ -15,6 +15,5 @@ int main(int argc, char* argv[])
     }
 
     Server w(port);
-    w.show();
     return a.exec();
 }
