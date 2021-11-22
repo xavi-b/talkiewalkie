@@ -64,6 +64,8 @@ void Talkie::initializeInputAudio(const QAudioDevice& deviceInfo)
     format.setSampleFormat(QAudioFormat::Int16);
 
     audioInput.reset(new QAudioSource(deviceInfo, format));
+    audioInput->start(socket);
+    audioInput->stop();
 
     connect(audioInput.get(), &QAudioSource::stateChanged, this, [=](QAudio::State state) {
         qDebug() << "QAudioSource" << state;
