@@ -20,6 +20,7 @@ signals:
     void emptyFrequency(QString const&);
 
 private:
+    QTcpSocket*          speaker = nullptr;
     QVector<QTcpSocket*> clients;
     QString              frequency;
 };
