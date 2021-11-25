@@ -36,6 +36,8 @@ Talkie::Talkie(QTcpSocket* socket, QWidget* parent)
 
     setLayout(layout);
 
+    pushTimer = new QTimer(this);
+
     player = new QMediaPlayer(this);
     player->setAudioOutput(new QAudioOutput());
     player->audioOutput()->setVolume(0.2f);
@@ -87,6 +89,28 @@ void Talkie::initializeOutputAudio(const QAudioDevice& deviceInfo)
     audioOutput.reset(new QAudioSink(deviceInfo, format));
     audioOutput->setVolume(2.0f);
     audioOutputIo = audioOutput->start();
+    pushTimer->disconnect();
+
+    connect(pushTimer, &QTimer::timeout, [this]() {
+        if (audioOutput->state() == QAudio::StoppedState)
+            return;
+
+        int len = audioOutput->bytesFree();
+        if (len)
+        {
+            int bufferLen = audioBuffer.size();
+            if (len > bufferLen)
+                len = bufferLen;
+
+            if (len)
+            {
+                audioOutputIo->write(audioBuffer.data(), len);
+                audioBuffer.remove(0, len);
+            }
+        }
+    });
+
+    pushTimer->start(10);
 
     qDebug() << "QAudioSink" << audioOutput->state();
 
@@ -113,16 +137,7 @@ void Talkie::stop()
 
 void Talkie::play(QByteArray const& data)
 {
-    qDebug() << "Play";
-
     audioBuffer.append(data);
-
-    if (audioBuffer.size() > 4092)
-    {
-        qDebug() << "Write";
-        audioOutputIo->write(audioBuffer);
-        audioBuffer.clear();
-    }
 }
 
 void Talkie::beep()

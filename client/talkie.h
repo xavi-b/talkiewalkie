@@ -15,6 +15,7 @@
 #include <QTcpSocket>
 #include <QMediaPlayer>
 #include <QAudioOutput>
+#include <QTimer>
 
 class Talkie : public QWidget
 {
@@ -39,6 +40,7 @@ private:
     void initializeInputAudio(const QAudioDevice& deviceInfo);
     void initializeOutputAudio(const QAudioDevice& deviceInfo);
 
+    QTimer*                      pushTimer;
     QMediaPlayer*                player;
     QIODevice*                   audioOutputIo;
     QByteArray                   audioBuffer;
