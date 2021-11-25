@@ -26,6 +26,9 @@ else()
     message("RELEASE")
 endif()
 
+# deployqt
+include("${CMAKE_CURRENT_SOURCE_DIR}/deployqt.cmake/deployqt.cmake")
+
 # subdirectories
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/client)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/server)

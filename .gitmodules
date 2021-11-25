@@ -1,0 +1,4 @@
+[submodule "deployqt.cmake"]
+	path = deployqt.cmake
+	url = git@github.com:xavi-b/deployqt.cmake.git
+	branch = master
