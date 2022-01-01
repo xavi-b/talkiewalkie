@@ -63,5 +63,6 @@ if(QT_VERSION_MAJOR EQUAL 6)
 endif()
 
 if(WIN32)
+    set_property(TARGET ${MODULE_NAME} PROPERTY WIN32_EXECUTABLE true)
     windeployqt(${MODULE_NAME})
 endif()
