@@ -53,3 +53,7 @@ target_link_libraries(${MODULE_NAME}
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${MODULE_NAME})
 endif()
+
+if(WIN32)
+    windeployqt(${MODULE_NAME})
+endif()
