@@ -1,11 +1,12 @@
 #include "server.h"
+#include <QCoreApplication>
 
 Server::Server(ushort port, QObject* parent)
     : QObject(parent)
 {
     connect(&serv, &QTcpServer::newConnection, this, &Server::onConnexion);
 
-    QFile file(":/users.csv");
+    QFile file(QCoreApplication::applicationDirPath() + "/users.csv");
     if (!file.open(QIODevice::ReadOnly))
     {
         qWarning() << file.errorString();
